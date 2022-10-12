@@ -96,33 +96,29 @@ And that is exactly the first thing that you will do!
 
 ```{r}
 ### EXPLORE HERE ###
-# Get a glimpse of cancer_sample and see its class
+# Get a glimpse of cancer_sample
 cancer_sample %>% 
   glimpse() 
-class(cancer_sample)
  
 ```
 
 ```{r}
-# Get a glimpse of flow_sample and see its class
+# Get a glimpse of flow_sample 
 flow_sample %>%
   glimpse()
-class(flow_sample)
 ```
 
 ```{r}
-# Get a glimpse of steam_games and see its class
+# Get a glimpse of steam_games 
 steam_games %>%
   glimpse()
-class(steam_games)
   
 ```
 
 ```{r}
-# Get a glimpse of vancouver_trees and see its class
+# Get a glimpse of vancouver_trees 
 vancouver_trees %>%
   glimpse()
-class(vancouver_trees)
 ```
 
 <!----------------------------------------------------------------------------->

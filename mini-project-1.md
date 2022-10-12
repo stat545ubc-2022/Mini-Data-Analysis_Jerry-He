@@ -166,7 +166,7 @@ comments outside of the code chunk?
 
 ``` r
 ### EXPLORE HERE ###
-# Get a glimpse of cancer_sample and see its class
+# Get a glimpse of cancer_sample
 cancer_sample %>% 
   glimpse() 
 ```
@@ -207,13 +207,7 @@ cancer_sample %>%
     ## $ fractal_dimension_worst <dbl> 0.11890, 0.08902, 0.08758, 0.17300, 0.07678, 0…
 
 ``` r
-class(cancer_sample)
-```
-
-    ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
-
-``` r
-# Get a glimpse of flow_sample and see its class
+# Get a glimpse of flow_sample 
 flow_sample %>%
   glimpse()
 ```
@@ -229,13 +223,7 @@ flow_sample %>%
     ## $ sym          <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
 
 ``` r
-class(flow_sample)
-```
-
-    ## [1] "tbl_df"     "tbl"        "data.frame"
-
-``` r
-# Get a glimpse of steam_games and see its class
+# Get a glimpse of steam_games 
 steam_games %>%
   glimpse()
 ```
@@ -265,13 +253,7 @@ steam_games %>%
     ## $ discount_price           <dbl> 14.99, NA, NA, NA, NA, 35.18, 70.42, 17.58, N…
 
 ``` r
-class(steam_games)
-```
-
-    ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
-
-``` r
-# Get a glimpse of vancouver_trees and see its class
+# Get a glimpse of vancouver_trees 
 vancouver_trees %>%
   glimpse()
 ```
@@ -298,12 +280,6 @@ vancouver_trees %>%
     ## $ date_planted       <date> 1999-01-13, 1996-05-31, 1993-11-22, 1996-04-29, 19…
     ## $ longitude          <dbl> -123.1161, -123.1147, -123.0846, -123.0870, -123.08…
     ## $ latitude           <dbl> 49.21776, 49.21776, 49.23938, 49.23469, 49.23894, 4…
-
-``` r
-class(vancouver_trees)
-```
-
-    ## [1] "tbl_df"     "tbl"        "data.frame"
 
 <!----------------------------------------------------------------------------->
 
