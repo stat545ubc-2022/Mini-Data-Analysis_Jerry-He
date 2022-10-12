@@ -96,31 +96,33 @@ And that is exactly the first thing that you will do!
 
 ```{r}
 ### EXPLORE HERE ###
-# Get a glimpse of cancer_sample
+# Get a glimpse of cancer_sample and see its class
 cancer_sample %>% 
   glimpse() 
+class(cancer_sample)
  
 ```
 
 ```{r}
-# Get a glimpse of flow_sample
+# Get a glimpse of flow_sample and see its class
 flow_sample %>%
   glimpse()
-
+class(flow_sample)
 ```
 
 ```{r}
-# Get a glimpse of steam_games
+# Get a glimpse of steam_games and see its class
 steam_games %>%
   glimpse()
+class(steam_games)
   
 ```
 
 ```{r}
-# Get a glimpse of vancouver_trees
+# Get a glimpse of vancouver_trees and see its class
 vancouver_trees %>%
   glimpse()
-
+class(vancouver_trees)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -277,6 +279,7 @@ To explore whether tumour compactness can be used as a reliable diagnostic marke
 First, let's calculate some summary statistics. Here, we will calculate the mean (and standard error of the mean), median, standard deviation, and range, just for the sake of completeness.
 
 ```{r}
+# 4. 
 # Create a new dataframe containing some summary statistics and also a new column with the full names for malignant and benign
 
 sum_compactness <- cancer %>% 
@@ -291,6 +294,7 @@ sum_compactness <- cancer %>%
 Now that we have our summary statistics, let's plot a bar graph to see if there is difference of means between diagnosis. We will plot the mean for each group and add an error bar showing the standard error of the mean as well.
 
 ```{r}
+# 5. 
 # Use geom_col() and geom_errorbar() to plot a bar graph showing the compactness mean and standard error of the mean between diagnosis
 
 sum_compactness %>% 
@@ -311,6 +315,7 @@ Before trying to create a "model", let's first see if there are any noticeable d
 First, we will calculate the mean, range, median, and standard deviation of all physical properties, grouped by diagnosis and store it in a new dataframe called `sum_cancer`.
 
 ```{r}
+# 1. 
 # Here, instead of using the range() function, we will use the max() and min() functions individually to calculate the range. This is nice here since using the range() function within summarize() creates two rows, one for max and one for min, which is actually redundant for our purposes. Using the functions individually will create two columns, one for max and one for min, which is more tidy.
 
 # Create a new dataframe containing summary statistics of all physical properties
@@ -337,12 +342,13 @@ psum_cancer <- sum_cancer %>%
 Now let's plot our data. There are a variety of geoms we could potentially use, but let's stick with geom_point() here. You might also notice that a lot of the points are really close together for some physical properties so we can use a log10 transformation to make the graph more readable.
 
 ```{r}
-# Plot our means between froups using geom_point()
+# 6. 
+# Plot our means between Groups using geom_point()
 
 psum_cancer %>% 
   ggplot(aes(x = Physical_Property, y = Mean, colour = diagnosis)) +
   geom_point() +
-  scale_y_continuous(trans = "log10") + # make y-axis log10 transformed
+  scale_y_continuous(trans = "log10") + # make y-axis log10 transformed, necessary here since non-area values are squished at the bottom
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.6, hjust = 0.5)) +
   labs(x = "Physical Property", colour = "Diagnosis") + # relabel the axes and legend title 
@@ -367,6 +373,7 @@ cancer %>%
 From this it looks like: `mean = 0.0628`, `min = 0.04996`, `max = 0.09744`. Based on this, let's arbitrarily say that a fractal dimension less than or equal to 0.055 is "low", between 0.055 and 0.075 is "medium", and greater than 0.075 is "high".
 
 ```{r}
+# 3. 
 # We can use mutate and the case_when() function to categorize `fractal_dimension_mean` based on the above conditions. 
 
 # Add a new column to our dataframe containing categorical variables for fractal complexity and select relevant columns
@@ -383,6 +390,7 @@ sum_cancer_fractal <- cancer %>%
 Now that we have categorized fractal dimensions, let's make a scatterplot of fractal dimension against area and see if we can fit some sort of model to it. We will also colour fractal dimension by our newly made categorical variables to help read our data.
 
 ```{r}
+# 5. 
 # Create a plot using geom_point and see if we can fit a linear regression model to it
 
 sum_cancer_fractal %>% 
@@ -405,6 +413,7 @@ Let's try and figure out if there is a relationship between tumour smoothness an
 To do this, let's make a scatterplot of smoothness against texture. We will calculate the means and medians of texture and plot it as a vertical line on our graph so we can also see if diagnosis as malignant or benign is more distributed to either side of the texture mean, if at all.
 
 ```{r}
+# 1. 
 # Calculate mean, range, median, standard deviation of texture. This dataframe will be used to make our vertical line representing texture median
 sum_texture <- cancer %>% 
   select(starts_with(c("texture", "smoothness"))) %>% 
@@ -414,7 +423,8 @@ sum_texture <- cancer %>%
 Now we can plot a scatterplot exploring smoothness vs texture. We will use geom_vline() to make our vertical line representing texture median. Additionally, we can also try to fit a model to our data.
 
 ```{r}
-# Plot our data. We will use the cancer dataset to create our scatterplot and the new dataframe created above to create a vertical line representing the median texture value. We will also try to fit a model for our data. 
+# 5. 
+# Plot our data. We will use the cancer dataset to create our scatterplot and the new dataframe created above to create a vertical line representing the median texture value using geom_vline(). We will also try to fit a model for our data. 
 
 cancer  %>% 
   ggplot(aes(x = texture_mean)) +

@@ -166,7 +166,7 @@ comments outside of the code chunk?
 
 ``` r
 ### EXPLORE HERE ###
-# Get a glimpse of cancer_sample
+# Get a glimpse of cancer_sample and see its class
 cancer_sample %>% 
   glimpse() 
 ```
@@ -207,7 +207,13 @@ cancer_sample %>%
     ## $ fractal_dimension_worst <dbl> 0.11890, 0.08902, 0.08758, 0.17300, 0.07678, 0…
 
 ``` r
-# Get a glimpse of flow_sample
+class(cancer_sample)
+```
+
+    ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
+
+``` r
+# Get a glimpse of flow_sample and see its class
 flow_sample %>%
   glimpse()
 ```
@@ -223,7 +229,13 @@ flow_sample %>%
     ## $ sym          <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
 
 ``` r
-# Get a glimpse of steam_games
+class(flow_sample)
+```
+
+    ## [1] "tbl_df"     "tbl"        "data.frame"
+
+``` r
+# Get a glimpse of steam_games and see its class
 steam_games %>%
   glimpse()
 ```
@@ -253,7 +265,13 @@ steam_games %>%
     ## $ discount_price           <dbl> 14.99, NA, NA, NA, NA, 35.18, 70.42, 17.58, N…
 
 ``` r
-# Get a glimpse of vancouver_trees
+class(steam_games)
+```
+
+    ## [1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame"
+
+``` r
+# Get a glimpse of vancouver_trees and see its class
 vancouver_trees %>%
   glimpse()
 ```
@@ -280,6 +298,12 @@ vancouver_trees %>%
     ## $ date_planted       <date> 1999-01-13, 1996-05-31, 1993-11-22, 1996-04-29, 19…
     ## $ longitude          <dbl> -123.1161, -123.1147, -123.0846, -123.0870, -123.08…
     ## $ latitude           <dbl> 49.21776, 49.21776, 49.23938, 49.23469, 49.23894, 4…
+
+``` r
+class(vancouver_trees)
+```
+
+    ## [1] "tbl_df"     "tbl"        "data.frame"
 
 <!----------------------------------------------------------------------------->
 
@@ -551,6 +575,7 @@ the mean (and standard error of the mean), median, standard deviation,
 and range, just for the sake of completeness.
 
 ``` r
+# 4. 
 # Create a new dataframe containing some summary statistics and also a new column with the full names for malignant and benign
 
 sum_compactness <- cancer %>% 
@@ -568,6 +593,7 @@ for each group and add an error bar showing the standard error of the
 mean as well.
 
 ``` r
+# 5. 
 # Use geom_col() and geom_errorbar() to plot a bar graph showing the compactness mean and standard error of the mean between diagnosis
 
 sum_compactness %>% 
@@ -597,6 +623,7 @@ of all physical properties, grouped by diagnosis and store it in a new
 dataframe called `sum_cancer`.
 
 ``` r
+# 1. 
 # Here, instead of using the range() function, we will use the max() and min() functions individually to calculate the range. This is nice here since using the range() function within summarize() creates two rows, one for max and one for min, which is actually redundant for our purposes. Using the functions individually will create two columns, one for max and one for min, which is more tidy.
 
 # Create a new dataframe containing summary statistics of all physical properties
@@ -637,12 +664,13 @@ physical properties so we can use a log10 transformation to make the
 graph more readable.
 
 ``` r
-# Plot our means between froups using geom_point()
+# 6. 
+# Plot our means between Groups using geom_point()
 
 psum_cancer %>% 
   ggplot(aes(x = Physical_Property, y = Mean, colour = diagnosis)) +
   geom_point() +
-  scale_y_continuous(trans = "log10") + # make y-axis log10 transformed
+  scale_y_continuous(trans = "log10") + # make y-axis log10 transformed, necessary here since non-area values are squished at the bottom
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.6, hjust = 0.5)) +
   labs(x = "Physical Property", colour = "Diagnosis") + # relabel the axes and legend title 
@@ -689,6 +717,7 @@ dimension less than or equal to 0.055 is “low”, between 0.055 and 0.075
 is “medium”, and greater than 0.075 is “high”.
 
 ``` r
+# 3. 
 # We can use mutate and the case_when() function to categorize `fractal_dimension_mean` based on the above conditions. 
 
 # Add a new column to our dataframe containing categorical variables for fractal complexity and select relevant columns
@@ -708,6 +737,7 @@ sort of model to it. We will also colour fractal dimension by our newly
 made categorical variables to help read our data.
 
 ``` r
+# 5. 
 # Create a plot using geom_point and see if we can fit a linear regression model to it
 
 sum_cancer_fractal %>% 
@@ -741,6 +771,7 @@ or benign is more distributed to either side of the texture mean, if at
 all.
 
 ``` r
+# 1. 
 # Calculate mean, range, median, standard deviation of texture. This dataframe will be used to make our vertical line representing texture median
 sum_texture <- cancer %>% 
   select(starts_with(c("texture", "smoothness"))) %>% 
@@ -752,7 +783,8 @@ use geom_vline() to make our vertical line representing texture median.
 Additionally, we can also try to fit a model to our data.
 
 ``` r
-# Plot our data. We will use the cancer dataset to create our scatterplot and the new dataframe created above to create a vertical line representing the median texture value. We will also try to fit a model for our data. 
+# 5. 
+# Plot our data. We will use the cancer dataset to create our scatterplot and the new dataframe created above to create a vertical line representing the median texture value using geom_vline(). We will also try to fit a model for our data. 
 
 cancer  %>% 
   ggplot(aes(x = texture_mean)) +
