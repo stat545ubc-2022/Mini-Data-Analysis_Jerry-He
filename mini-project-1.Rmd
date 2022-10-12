@@ -236,8 +236,8 @@ So far, you have chosen a dataset and gotten familiar with it through exploring 
 **Research Questions**
 
 1.  Can tumour compactness be used as a reliable diagnostic marker for tumour malignancy? If so, are there any other physical properties that share a positive correlation with tumour compactness and therefore malignancy?
-2.  How are physical properties of tumours related to its malignancy. Create a model that accurately describes the relationships of physical tumour properties to the likelihood of a malignant diagnosis. 
-3.  How do  physical parameters such as smoothness, concave points, area, etc. affect the fractal dimension of a tumour?
+2.  How are physical properties of tumours related to its malignancy. Create a model that accurately describes the relationships of physical tumour properties to the likelihood of a malignant diagnosis.
+3.  How do physical parameters such as smoothness, concave points, area, etc. affect the fractal dimension of a tumour?
 4.  Is there a relationship between tumour smoothness and texture?
 
 <!---------------------------->
@@ -269,83 +269,94 @@ Ensure that the output of each operation is printed!
 Make sure it's clear what research question you are doing each operation for!
 
 <!------------------------- Start your work below ----------------------------->
-#### 1. Can tumour compactness be used as a reliable diagnostic marker for tumour malignancy? If so, are there any other physical properties that share a positive correlation with tumour compactness and therefore malignancy?
+
+### 1. Can tumour compactness be used as a reliable diagnostic marker for tumour malignancy? If so, are there any other physical properties that share a positive correlation with tumour compactness and therefore malignancy?
+
+To explore whether tumour compactness can be used as a reliable diagnostic marker for tumour malignancy, let's try and determine if there is any statistically significant differences in the means of tumour compactness between diagnosis groups.
+
+First, let's calculate some summary statistics. Here, we will calculate the mean (and standard error of the mean), median, standard deviation, and range, just for the sake of completeness.
+
 ```{r}
-# Summarize: Divide "compactness_mean" into 3 groups: low, medium, high
-
-# First summarize compactness data for min, max, and mean to split the data into low, medium, or high
-sum_cancer_compact <- cancer %>% 
-  summarize(Min_compact = min(compactness_mean), Max_compact = max(compactness_mean), Mean_compact = mean(compactness_mean))
-
-# We see that the min = ~0.02, max = ~0.3, and mean 0.1. Now let's assign categorical variables. 
-# Let's say that for a mean compactness < 0.05 is low, mean_compactness between 0.05 and 0.15 is medium, and a mean compactness greater than 0.15 is high. 
-# We will create a new column with these assignments using the case_when() function
-
-cancer_compactness <- cancer %>% 
-  mutate(compactness_category = 
-           case_when(
-             compactness_mean <= 0.05 ~ "low", 
-             compactness_mean <= 0.15 & compactness_mean > 0.05 ~ "medium", 
-             compactness_mean > 0.15 ~ "high")) %>% 
-  select(ID, diagnosis, starts_with("compactness")) 
-
-# Great, now we have a subsetted dataframe that contains categorical variables for the compactness_mean numerical variables!
-
-# Graphing: Visualize how many observations for each diagnosis we see for each compactness category 
-# Now that we have our categorical data, we can plot how many observations of M or B we see in each of our categories:
-
-cancer_compactness %>% 
-  ggplot(aes(x = compactness_worst, y = diagnosis, fill = compactness_category)) +
-  geom_density_ridges(alpha = 0.7) +
-  scale_x_continuous(trans = "log10") +
-  ylab("Compactness Category") +
-  xlab("Mean Compactness") +
-  theme_bw()
-
-cancer_compactness %>% 
-  ggplot(aes(x = diagnosis, fill = compactness_category)) +
-  geom_bar() +
-  geom_jitter(aes(y = compactness_mean, colour = compactness_category)) +
-  scale_y_continuous(trans = "log10")
-           
+sum_compactness <- cancer %>% 
+  select(ID, diagnosis, compactness_mean) %>% # select for relevant columns
+  group_by(diagnosis) %>% 
+  summarize(across(compactness_mean, list(mean = mean_se, median = median, sd = sd, max = max, min = min), .names = "{.fn}")) %>%
+  mutate(diagnosis_full = case_when(
+    diagnosis == "M" ~ "Malignant", 
+    diagnosis == "B" ~ "Benign")) # create a new column that renames "M" or "B" as "Malignant" or "Benign".
 ```
 
-#### 2.  How are physical properties of tumours related to its malignancy. Create a model that accurately describes the relationships of physical tumour properties to the likelihood of a malignant diagnosis. 
+Now that we have our summary statistics, let's plot a bar graph to see if there is difference of means between diagnosis. We will plot the mean for each group and add an error bar showing the standard error of the mean as well.
+
 ```{r}
-# Calculate mean, range, median, and standard deviation of all physical properties for malignant tumours
+sum_compactness %>% 
+  ggplot(aes(x = diagnosis_full, y = mean$y, fill = diagnosis_full)) +
+  geom_col(width = 0.3) + #geom1
+  geom_errorbar(aes(ymin = mean$ymin, ymax = mean$ymax), width = 0.3) + # add error bars, geom2
+  theme_bw() +
+  labs(y = "Mean Compactness", x = "Diagnosis") + # relabel our axes
+  theme(legend.position = "none") # hide the legend
+```
+
+From our plot, it looks like there is a difference between the means of malignant and benign tumour compactness. The standard error is also pretty small so it looks like this difference *could* be significant! We'll have to perform a t-test down the line to confirm.
+
+### 2. How are physical properties of tumours related to its malignancy. Create a model that accurately describes the relationships of physical tumour properties to the likelihood of a malignant diagnosis.
+
+Before trying to create a "model", let's first see if there are any noticeable differences between the means of the physical properties in each diagnosis, either malignant or benign.
+
+First, we will calculate the mean, range, median, and standard deviation of all physical properties, grouped by diagnosis and store it in a new dataframe called `sum_cancer`.
+
+```{r}
+# Here, instead of using the range() function, we will use the max() and min() functions individually to calculate the range. This is nice here since using the range() function within summarize() creates two rows, one for max and one for min, which is actually redundant for our purposes. Using the functions individually will create two columns, one for max and one for min, which is more tidy.
 sum_cancer <- cancer %>% 
   select(ID, diagnosis, ends_with("mean")) %>% 
   group_by(diagnosis) %>% 
   summarize(across(ends_with("mean"), list(Mean = mean, Min = min, Max = max, Median = median, SD = sd)))
-  
+```
 
-# 
+Now that we have a dataframe containing a bunch of summary stats for each diagnosis, let's plot the means of each physical characteristic grouped by diagnosis. This can help us see if there is a noticeable difference between the malignant or benign groups for each physical property.
+
+To do this, we should pivot our data longer as this will make it a lot easy to plot using ggplot. Let's pivot all the names of the means of physical properties into a column called `Physical_Property` and all of the values into a column called `Mean`.
+
+```{r}
 psum_cancer <- sum_cancer %>% 
   select(diagnosis, ends_with("Mean")) %>% 
   pivot_longer(cols = ends_with("Mean"), names_to = "Physical_Property", values_to = "Mean") %>% 
-  separate(Physical_Property, into = c("Physical_Property"), sep = "_", remove = TRUE)
+  separate(Physical_Property, into = c("Physical_Property"), sep = "_", remove = TRUE) # this line of code is a workaround that removes the suffixes to our colnames. It will make our plot look a tad bit cleaner.
+```
 
+Now let's plot our data. There are a variety of geoms we could potentially use, but let's stick with geom_point() here. You might also notice that a lot of the points are really close together for some physical properties so we can use a log10 transformation to make the graph more readable.
+
+```{r}
 psum_cancer %>% 
   ggplot(aes(x = Physical_Property, y = Mean, colour = diagnosis)) +
   geom_point() +
-  scale_y_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10") + # make y-axis log10 transformed
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.6, hjust = 0.5)) +
-  labs(x = "Physical Property", colour = "Diagnosis")
-  
+  labs(x = "Physical Property", colour = "Diagnosis") + # relabel the axes and legend title 
+  scale_colour_discrete(labels = c("Benign", "Malignant")) # relabel our legend text to their full names
   
 ```
 
+It looks like the means of a lot of physical properties have a noticeable difference between diagnoses. Notably, area, compactness, concave points, and concavity look to have the greatest differences. Fractal dimension seems to have no difference in mean and smoothness and symmetry also seem to have minimal difference. Next, we should do some stats analysis to see if these differences are *actually* statistically significant!
 
+### 3. How do physical parameters such as smoothness, concave points, area, etc. affect the fractal dimension of a tumour?
 
-#### 3.  How do  physical parameters such as smoothness, concave points, area, etc. affect the fractal dimension of a tumour? 
+To start off, let's try and determine if there is a relationship between area and fractal dimension. Fractal dimension is (at least to my knowledge) a measure of how complex something is. So we will ask ourselves if having a greater area increases, decreases, or has no effect on tumour complexity.
+
+Let's make some new categorical variables for our fractal dimensions. Before doing this, let's see what the max, min, and mean of `fractal_dimension_mean` is so we can make an informed decision on how to categorize `fractal dimensions`.
+
 ```{r}
-# 
+# Make a new summary dataset containing mean, min, and max. 
 cancer %>% 
   summarize(Mean = mean(fractal_dimension_mean), Min = min(fractal_dimension_mean), Max = max(fractal_dimension_mean))
+```
 
-# mean = 0.0628, min - 0.04996, max - 0.09744
-# categorize
+From this it looks like: `mean = 0.0628`, `min = 0.04996`, `max = 0.09744`. Based on this, let's arbitrarily say that a fractal dimension of \<= 0.055 is "low", between 0.055 and 0.075 is "medium", and greater than 0.075 is "high".
+
+```{r}
+# We can use mutate and the case_when() function to categorize `fractal_dimension_mean` based on conditions. 
 sum_cancer_fractal <- cancer %>% 
   mutate("fractal_complexity" = 
            case_when(
@@ -353,27 +364,52 @@ sum_cancer_fractal <- cancer %>%
              fractal_dimension_mean > 0.055 & fractal_dimension_mean <= 0.075 ~ "medium", 
              fractal_dimension_mean > 0.075 ~ "high"
            )) %>% 
-  select(ID, diagnosis, starts_with(c("concave", "fractal")))
+  select(ID, diagnosis, starts_with(c("area", "fractal"))) # here we will only select data that's pertinent to us right now.
+```
 
+Now that we have categorized fractal dimensions, let's make a scatterplot of fractal dimension against area and see if we can fit some sort of model to it. We will also colour fractal dimension by our newly made categorical variables to help read our data.
+
+```{r}
 sum_cancer_fractal %>% 
-  ggplot(aes(x = concave_points_mean, y = fractal_dimension_mean)) +
+  ggplot(aes(x = area_mean, y = fractal_dimension_mean)) +
   geom_point(aes(colour = fractal_complexity)) +
   geom_smooth(method = "lm") +
-  theme_bw()
+  theme_bw() +
+  labs(y = "Mean Fractal Dimension", x = "Mean Area", colour = "Fractal Complexity") + # rename axes and legend titles
+  scale_color_discrete(labels = c("High", "Low", "Medium")) # relabel legend text
 
 
 ```
 
+It looks like there is a slight negative correlation of fractal dimension to area! This is cool and could be worth exploring more! We could also explore how other physical properties relate to fractal dimension too in a similar way.
 
+### 4. Is there a relationship between tumour smoothness and texture?
 
+Let's try and figure out if there is a relationship between tumour smoothness and texture. Smoothness inherently seems like it would affect texture (right?) so this could be interesting!
 
-#### 4.  Is there a relationship between tumour smoothness and texture?
+To do this, let's make a scatterplot of smoothness against texture. We will calculate the means and medians of texture and plot it as a vertical line on our graph so we can also see if diagnosis as malignant or benign is more distributed to either side of the texture mean, if at all.
+
 ```{r}
-# Calculate mean, range, median, standard deviation of smoothness 
+# Calculate mean, range, median, standard deviation of texture. This dataframe will be used to make our vertical line representing texture median
+sum_texture <- cancer %>% 
+  select(starts_with(c("texture", "smoothness"))) %>% 
+  summarize(Mean_texture = mean(texture_mean), Median_texture = median(texture_mean))
 ```
 
+Now we can plot a scatterplot exploring smoothness vs texture. We will use geom_vline() to make our vertical line representing texture median. Additionally, we can also try to fit a model to our data.
 
+```{r}
+cancer  %>% 
+  ggplot(aes(x = texture_mean)) +
+  geom_point(aes(y = smoothness_mean, colour = diagnosis), alpha = 0.8) + #geom1
+  geom_vline(xintercept = sum_texture$Median_texture) + #geom2
+  geom_smooth(aes(y = smoothness_mean), method = "lm") + # fit a linear regression model to our data, geom3
+  theme_bw() +
+  labs(y = "Mean Smoothness", x = "Mean Texture", colour = "Diagnosis") + # rename axes
+  scale_colour_discrete(labels = c("Benign", "Malignant")) # rename legend text to full names
+```
 
+Well, it looks like there isn't a very distinct relationship between texture and smoothness. Maybe this is counterintuitive, but at least now we know! Regardless, diagnosis seems to be more slightly distributed more towards a higher texture score, so this could be interesting to explore more!
 
 <!----------------------------------------------------------------------------->
 
