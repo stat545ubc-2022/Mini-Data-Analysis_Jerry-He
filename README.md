@@ -14,6 +14,9 @@ The R Markdown file of the Mini Data Analysis delivarable 1 containing some expl
 #### mini-project-1.md
 The plain markdown file generated from knitting the .Rmd file. 
 
+### mini-project-1_files
+A folder containing plots for mini-project-1.md. This folder is required for the .md file to render output plots. 
+
 ## Running Code
 The code in this repo can be run locally by cloning this Git repository. We recommend you use RStudio to run our code (since our code is all in R). To do this, open **RStudio** -> go to **New Project** in the upper right corners -> Click **Version Control** -> **Git** -> enter the **repository URL** and you are all set. The repository URL can be found under the **Code** tab in our repository.
 
