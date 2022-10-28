@@ -8,14 +8,14 @@ This Mini Data Analysis project is part of the STAT 545A class at UBC and is mea
 #### README.md
 The README file that you are reading right now. 
 
-#### mini-project-1.Rmd
-The R Markdown file of the Mini Data Analysis delivarable 1 containing some exploratory data analysis of the `cancer_sample` dataset from the `datateachr` R package.
+#### Mini-Data-Analysis-1
+This folder contains files from the first milestone of the Mini Data Analysis Project. More information on Milestone 1 and the files contained within this directory can be found in the `README.md` file within this directory. 
 
-#### mini-project-1.md
-The plain markdown file generated from knitting the .Rmd file. 
+#### Mini-Data-Analysis-2
+This is a folder contains files from the second milestone of the Mini Data Analysis Project. More information on Milestone 2 and the files contained within this directory can be found in the `README.md` file within this directory. 
 
-### mini-project-1_files
-A folder containing plots for mini-project-1.md. This folder is required for the .md file to render output plots. 
+#### output
+This folder contains output files from Mini-Data-Analysis 2. More information on the output files in this directory can be found in the `README.md` file within this directory. 
 
 ## Running Code
 The code in this repo can be run locally by cloning this Git repository. We recommend you use RStudio to run our code (since our code is all in R). To do this, open **RStudio** -> go to **New Project** in the upper right corners -> Click **Version Control** -> **Git** -> enter the **repository URL** and you are all set. The repository URL can be found under the **Code** tab in our repository.
