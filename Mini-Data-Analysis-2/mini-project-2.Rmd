@@ -42,6 +42,8 @@ Begin by loading your data and the tidyverse package below:
 ```{r, message = FALSE}
 library(datateachr) # <- might contain the data you picked!
 library(tidyverse)
+library(broom)
+library(here)
 ```
 
 # Task 1: Tidy your data (15 points)
@@ -349,12 +351,7 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 Since we have decided to use a t-test to assess significance of results between malignant and benign diagnosis between area means, we need to see the ***p-value*** to actually assess how confident we are in the difference between these two groups of area means. To do this, we can use the `broom` package - specifically the `glance()` function - to extract out the ***p-value***.
 
 ```{r}
-# First, load the broom package
-library(broom)
-```
-
-```{r}
-# Now, we can use glance() to extract the p-value of our t-test
+# We can use glance() to extract the p-value of our t-test
 pvalue <- glance(testT)$p.value
 pvalue
 ```
@@ -376,14 +373,7 @@ Take a summary table that you made from Milestone 1 (Task 4.2), and write it as 
 
 <!-------------------------- Start your work below ---------------------------->
 #### Write `cancer_dat` as a csv file to a new directory called `output`
-First, let's load the `here` package. We can avoid this by simply calling the `here()` function directly from the `here` package like so: `here::here()`, but I prefer to just load the entire package, although I don't know if there's some downside to this.
-
-```{r}
-# Load there here package
-library(here)
-```
-
-Now we can make a new directory in our current working directory called "output". We can do this regularly through Finder (on macOS) or we can actually also make a new directory directly through R. For fun, we will make the `output` directory through R using the `dir.create()` function combined with `here()`.
+Let's make a new directory in our current working directory called "output". We can do this regularly through Finder (on macOS) or we can actually also make a new directory directly through R. For fun, we will make the `output` directory through R using the `dir.create()` function combined with `here()`.
 
 ```{r}
 # Create a new directory, output, in our working directory

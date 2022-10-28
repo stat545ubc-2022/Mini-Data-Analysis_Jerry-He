@@ -70,6 +70,8 @@ Begin by loading your data and the tidyverse package below:
 ``` r
 library(datateachr) # <- might contain the data you picked!
 library(tidyverse)
+library(broom)
+library(here)
 ```
 
 # Task 1: Tidy your data (15 points)
@@ -608,12 +610,7 @@ use the `broom` package - specifically the `glance()` function - to
 extract out the ***p-value***.
 
 ``` r
-# First, load the broom package
-library(broom)
-```
-
-``` r
-# Now, we can use glance() to extract the p-value of our t-test
+# We can use glance() to extract the p-value of our t-test
 pvalue <- glance(testT)$p.value
 pvalue
 ```
@@ -649,19 +646,7 @@ function.
 
 #### Write `cancer_dat` as a csv file to a new directory called `output`
 
-First, let’s load the `here` package. We can avoid this by simply
-calling the `here()` function directly from the `here` package like so:
-`here::here()`, but I prefer to just load the entire package, although I
-don’t know if there’s some downside to this.
-
-``` r
-# Load there here package
-library(here)
-```
-
-    ## here() starts at /Users/jerryhe/Desktop/STAT_545/Mini-Data-Analysis
-
-Now we can make a new directory in our current working directory called
+Let’s make a new directory in our current working directory called
 “output”. We can do this regularly through Finder (on macOS) or we can
 actually also make a new directory directly through R. For fun, we will
 make the `output` directory through R using the `dir.create()` function
@@ -670,7 +655,12 @@ combined with `here()`.
 ``` r
 # Create a new directory, output, in our working directory
 dir.create(here("output"))
+```
 
+    ## Warning in dir.create(here("output")): '/Users/jerryhe/Desktop/STAT_545/Mini-
+    ## Data-Analysis/output' already exists
+
+``` r
 # Now we can use the "write_csv" command from the `readr` package to save our dataframe as a csv in the newly made output folder. 
 write_csv(cancer_dat, here("output", "cancer_summary.csv"))
 ```
