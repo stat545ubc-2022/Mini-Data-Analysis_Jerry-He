@@ -61,8 +61,9 @@ A reminder of the definition of *tidy* data:
 Based on the definition above, can you identify if your data is tidy or untidy? Go through all your columns, or if you have \>8 variables, just pick 8, and explain whether the data is untidy or tidy.
 
 <!--------------------------- Start your work below --------------------------->
-
+#### Check if our data is tidy
 ```{r}
+# In Milestone 1, I used the cancer_sample dataset
 # Check first 8 columns of cancer_sample to check if the data is tidy
 cancer_sample %>% 
   select(1:8)
@@ -81,7 +82,7 @@ If your data is untidy, then tidy it! Then, untidy it back to it's original stat
 Be sure to explain your reasoning for this task. Show us the "before" and "after".
 
 <!--------------------------- Start your work below --------------------------->
-
+#### Untidying our data
 Since our data is already tidy, we will start by untidying it! To do this, we will bring the names of each physical parameter being measured into a single column called `parameters` and all their associated measurements into a column called `measurements`. We will use `pivot_longer()` to do this.
 
 ```{r}
@@ -92,20 +93,20 @@ cancer <- cancer_sample
 cancer_untidy <- cancer %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "parameters", values_to = "measurements")
 
-cancer_untidy
+glimpse(cancer_untidy)
 
 ```
 
-Now we have very untidy data. `parameters` now consists of repeated variables and each row is no longer a new observation, since they are repeated for each ID. In this specific case, there isn't a great reason to untidy our data however, untidying it in the way we just did could be useful for plotting each physical parameter as a discrete variable for something like a barplot!
+Now we have very untidy data. `parameters` now consists of repeated variables and each row is no longer a new observation, since they are repeated for each ID. In this specific case, there isn't a great reason to untidy our data; however, untidying it in the way we just did could be useful for plotting each physical parameter as a discrete variable for something like a barplot!
 
-Anyway, our data is now untidy and could be useful for future plotting. Let's tidy it back up since it will be easier to read and manipulate using `tidyverse` functions, especially since we are going to do some summarizing up ahead! To tidy up, we'll use the "inverse" of `pivot_longer()`, `pivot_wider()`.
+Anyway, our data is now untidy and could be useful for future plotting. Let's tidy it back up since it will be easier to read and manipulate using `tidyverse` functions, especially since we are going to do some wrangling up ahead! To tidy up, we'll use the "inverse" of `pivot_longer()`, `pivot_wider()`.
 
 ```{r}
 # Now let's tidy up our data again. We will use pivot_wider() to undo what we did with pivot_longer().
 cancer_tidy <- cancer_untidy %>% 
   pivot_wider(names_from = parameters, values_from = measurements)
 
-print(cancer_tidy)
+head(cancer_tidy)
 ```
 
 Great, now our data is back to the tidyness that it was before. Each column is once again a variable, in this case a physical parameter, and each row is a unique observation.
@@ -127,27 +128,30 @@ Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
 
-Research question 1 is an interesting question that could help to identify a certain physical characteristic as a diagnostic marker of tumour malignancy.
+**Research Question 1 is an interesting exploratory question that could help to identify certain physical characteristics as potential diagnostic markers of tumour malignancy.**
 
-Research question 2 would be interesting to explore simply because there are many physical parameters that are linked in tumours so it would be fun to see how they are related.
+
+**Research question 2 would be interesting to explore because there are many physical parameters that are linked in tumours. It would be valuable to understand how these characteristics are linked and could be useful to generate models of physical tumour characteristics down the line.**
 
 <!----------------------------------------------------------------------------->
 
 Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidy'ing, dropping irrelevant columns, etc.).
 
 <!--------------------------- Start your work below --------------------------->
-
-We will go ahead and modify the original `cancer` dataframe so that it is more concise and interpretable for us. We are mostly interested in the "mean" values so let's nto concern ourselves with anything else. In other words, we will drop all standard error and *worst* columns. Additionally, something that we might really be interested in with respect to diagnostic markers is the `area_mean`, so let's arrange `area_mean` in descending order and also make sure there are no `NA` values in this column to make the data easier to read and manipulate moving forward. Finally, let's replace "M" and "B" in the `diagnosis` column with the whole words. This is a matter of personal preference, but will also make the plot labels nicer to read down the line.
+#### Wrangling our data
+We will go ahead and modify the original `cancer` dataframe so that it is more concise and interpretable for us. We are mostly interested in the "mean" values so let's not concern ourselves with anything else. In other words, we will drop all *standard error* and *worst* columns. Additionally, something that we might really be interested in with respect to diagnostic markers is the `area_mean`, so let's arrange `area_mean` in descending order and also make sure there are no `NA` values in this column to make the data easier to read and manipulate moving forward. Finally, let's replace "M" and "B" in the `diagnosis` column with the whole words. This is a matter of personal preference, but will also make the plot labels nicer to read down the line.
 
 ```{r}
 # Summarize our data as above
 cancer_dat <- cancer %>% 
-  select(-ends_with("worst"), -ends_with("_se")) %>% 
-  arrange(desc(area_mean)) %>% 
-  filter(is.na(area_mean) == FALSE) %>% 
+  select(-ends_with("worst"), -ends_with("_se")) %>% # 1
+  arrange(desc(area_mean)) %>% # 2
+  filter(is.na(area_mean) == FALSE) %>% # 3
   summarize(ID, 
             diagnosis = case_when(diagnosis == "M" ~ "Malignant", diagnosis == "B" ~ "Benign"), 
-            across(ends_with("mean")))
+            across(ends_with("mean"))) # 4
+
+glimpse(cancer_dat)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -159,7 +163,7 @@ For this exercise, you'll be choosing two of the three tasks below -- both tasks
 But first, tasks 1 and 2 below ask you to modify a plot you made in a previous milestone. The plot you choose should involve plotting across at least three groups (whether by facetting, or using an aesthetic like colour). Place this plot below (you're allowed to modify the plot if you'd like). If you don't have such a plot, you'll need to make one. Place the code for your plot below.
 
 <!-------------------------- Start your work below ---------------------------->
-
+#### Generate our plot from Milestone 1
 Now we can modify our newly made dataframe from above. We will make a plot that is similar but slightly modified from some of the plots in Milestone 1.
 
 More specifically, we would like to create a barplot of the *difference* between means of malignant and benign diagnosis groups. Plotting this way rather than plotting both of the means *might* be more clear, but I guess this is a matter up for debate.
@@ -178,21 +182,23 @@ sum_cancer <- mean_cancer %>%
   summarize(across(ends_with("mean"), ~lead(.x) - .x, .names = "{.col}_diff"))%>% 
   na.omit()
 
+glimpse(sum_cancer)
 ```
 
-One important consideration about comparing these *differences* is that not all differences are the same (?). For example, `area` values are much larger than any other physical parameter in this dataset. Differences in area mean might seem huge in comparison to a parameter like `fractal_complexity`, whose values are about 100X smaller and a difference might be as small as 0.1. To account for this, we can try and normalize all the differences by a normalization factor, which in the case will be the sum of all the differences. We will also divide the normalization factor by an arbitrary number (100) so that the differences between parameters are a little but more noticeable (which I think we are allowed to do?).
+One important consideration about comparing these *differences* is that not all differences are the same (?). For example, `area` values are much larger than any other physical parameter in this dataset. Differences in area mean might seem huge in comparison to a parameter like `fractal_complexity`, whose values are about 100X smaller. To account for this, we can try and normalize all the differences by a normalization factor, which in this case will be the sum of all the differences. We will also divide the normalization factor by an arbitrary number (100) so that trends are a little bit more noticeable (which I think we are allowed to do?).
 
 ```{r}
 # Create our normalization factor which is the sum of all the mean differences (in our case this is the sum of all columns in our row) divided by 100
 normalizationFactor <- rowSums(sum_cancer[1, ]) / 100
 
 # Use pivot_longer() to pivot all physical property names into one column and values into another
-# Here, we will also mutate all of our differences by the normalization factor and add an arbitrary constant 1.1 so that all of our values are greater than 0 (this is important since we will log transform our axis later on)
+# Here, we will also mutate all of our differences by the normalization factor and add an arbitrary constant, 1.1, so that all of our values are greater than 0  (this is important since we will log transform our axis later on and don't want to see negative values when taking log(x < 1))
 norm_cancer <- sum_cancer %>% 
   pivot_longer(cols = ends_with("diff"), names_to = "Physical_Property", values_to = "Difference") %>% 
   separate(Physical_Property, into = c("Physical_Property"), sep = "_", remove = TRUE) %>% 
-  mutate(Difference = (Difference / normalizationFactor) + 1.1) 
+  mutate(Difference = (Difference / normalizationFactor) + 1.1) # normalize our difference values and add arbitrary constant 1.1
 
+glimpse(norm_cancer)
 ```
 
 Now let's generate our barplot:
@@ -232,7 +238,7 @@ Now, choose two of the following tasks.
 
 **Task Number**: 1
 
-#### Reorder Levels from Greatest to Least by `Difference`
+#### Reorder levels from greatest to least by `Difference`
 
 Oftentimes, it is beneficial to see plots in decreasing or increasing order. This allows our *eyes* to more easily understand trends and extract meaningful information from plots. In light of this, let's reorder our plot so that the bars are presented in descending order, with the greatest difference between malignant and benign values to the left.
 
@@ -262,7 +268,7 @@ fct_cancer %>%
 
 **Task Number**: 2
 
-#### Collapse Uninteresting Factors into a New Factor Called "Other"
+#### Collapse uninteresting factors into a new factor called "Other"
 
 From the above plot, we see that there are a lot of bars that basically show a whole lot of nothing (i.e. there isn't a big difference between the means of Malignant and Benign tumours). These physical parameters are thus not of great importance to us. To try and more clearly show what's important to us, which are the physical properties with a sizable difference, we can combine all "uninteresting" `Physical_Property` factors into a new factor called `Other` and plot the mean of those combined properties.
 
@@ -309,10 +315,10 @@ Fit a model or run a hypothesis test that provides insight on this variable with
     -   You could use `lm()` to test for significance of regression.
 
 <!-------------------------- Start your work below ---------------------------->
+#### Testing for statistical significance of `area_mean` between diagnosis groups
+From our plots above, it looks like there's a pretty big difference between the `area_mean` of malignant and benign tumour groups. Let's see if this difference is actually statistically significant using a t-test.
 
-From our plots above, it looks like there's a pretty big difference between the mean area of malignant and benign tumour groups. Let's see if this difference is actually statistically significant.
-
-First, we will go back to the original `cancer` dataframe and extract all `area_mean` values for each diagnosis group.
+First, we will go back to the original `cancer` dataframe and extract all `area_mean` values for each diagnosis group. Then we will use the `t.test()` function to perform a t-test on our means. 
 
 ```{r}
 # Create two new variables storing all `area_mean` values for malignant groups or benign groups
@@ -339,7 +345,7 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
-
+#### Extracting a p-value
 Since we have decided to use a t-test to assess significance of results between malignant and benign diagnosis between area means, we need to see the ***p-value*** to actually assess how confident we are in the difference between these two groups of area means. To do this, we can use the `broom` package - specifically the `glance()` function - to extract out the ***p-value***.
 
 ```{r}
@@ -353,7 +359,7 @@ pvalue <- glance(testT)$p.value
 pvalue
 ```
 
-Our p-value looks super small so it looks like it's safe to say that the difference in area mean between benign and malignant groups is statistically significant!
+Our p-value looks super small so it looks like it's safe to say that the difference in `area_mean` between benign and malignant groups is statistically significant!
 
 <!----------------------------------------------------------------------------->
 
@@ -369,8 +375,8 @@ Take a summary table that you made from Milestone 1 (Task 4.2), and write it as 
 -   **Reproducibility criteria**: You should be able to delete the csv file, and remake it simply by knitting this Rmd file.
 
 <!-------------------------- Start your work below ---------------------------->
-
-First, let's load the `here` package. We can avoid this by simply calling the `here()` function directly from the `here` package like so: `here::here()`, but I prefer to just load the entire package, although I don't know if there's some downside to this. 
+#### Write `cancer_dat` as a csv file to a new directory called `output`
+First, let's load the `here` package. We can avoid this by simply calling the `here()` function directly from the `here` package like so: `here::here()`, but I prefer to just load the entire package, although I don't know if there's some downside to this.
 
 ```{r}
 # Load there here package
@@ -396,17 +402,14 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 -   The same robustness and reproducibility criteria as in 3.1 apply here.
 
 <!-------------------------- Start your work below ---------------------------->
-
-Now we will save our model object to a .rds file. Let's go ahead and save the our model object from the t-test to a new variable called `task3_obj`. Then, we will save this model object as a .rds with `saveRDS()` and then reload into R with `readRDS()`
+#### Write our model object to an .rds file and load it back into our environmentk
+Now we will save our model object to a .rds file. The name of our model object is `testT` so we will save this as a .rds with `saveRDS()` and then reload into R with `readRDS()`.
 
 ```{r}
-# Create a new object called task3_obj that saves the entire output of glance(testT)
-task3_obj <- glance(testT)
+# Write a .rds file from testT as task3_obj.rds. Use the here() function for robustness
+saveRDS(testT, here("output", "task3_obj.rds"))
 
-# Write a .rds file from task3_obj. Use the here() function for robustness
-saveRDS(task3_obj, here("output", "task3_obj.rds"))
-
-# Load our .rds file
+# Load our .rds file 
 readRDS(here("output", "task3_obj.rds"))
 ```
 

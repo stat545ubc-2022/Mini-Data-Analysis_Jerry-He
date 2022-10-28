@@ -95,7 +95,10 @@ pick 8, and explain whether the data is untidy or tidy.
 
 <!--------------------------- Start your work below --------------------------->
 
+#### Check if our data is tidy
+
 ``` r
+# In Milestone 1, I used the cancer_sample dataset
 # Check first 8 columns of cancer_sample to check if the data is tidy
 cancer_sample %>% 
   select(1:8)
@@ -136,6 +139,8 @@ and “after”.
 
 <!--------------------------- Start your work below --------------------------->
 
+#### Untidying our data
+
 Since our data is already tidy, we will start by untidying it! To do
 this, we will bring the names of each physical parameter being measured
 into a single column called `parameters` and all their associated
@@ -150,35 +155,27 @@ cancer <- cancer_sample
 cancer_untidy <- cancer %>% 
   pivot_longer(cols = 3:ncol(.), names_to = "parameters", values_to = "measurements")
 
-cancer_untidy
+glimpse(cancer_untidy)
 ```
 
-    ## # A tibble: 17,070 × 4
-    ##        ID diagnosis parameters             measurements
-    ##     <dbl> <chr>     <chr>                         <dbl>
-    ##  1 842302 M         radius_mean                 18.0   
-    ##  2 842302 M         texture_mean                10.4   
-    ##  3 842302 M         perimeter_mean             123.    
-    ##  4 842302 M         area_mean                 1001     
-    ##  5 842302 M         smoothness_mean              0.118 
-    ##  6 842302 M         compactness_mean             0.278 
-    ##  7 842302 M         concavity_mean               0.300 
-    ##  8 842302 M         concave_points_mean          0.147 
-    ##  9 842302 M         symmetry_mean                0.242 
-    ## 10 842302 M         fractal_dimension_mean       0.0787
-    ## # … with 17,060 more rows
+    ## Rows: 17,070
+    ## Columns: 4
+    ## $ ID           <dbl> 842302, 842302, 842302, 842302, 842302, 842302, 842302, 8…
+    ## $ diagnosis    <chr> "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M…
+    ## $ parameters   <chr> "radius_mean", "texture_mean", "perimeter_mean", "area_me…
+    ## $ measurements <dbl> 1.799e+01, 1.038e+01, 1.228e+02, 1.001e+03, 1.184e-01, 2.…
 
 Now we have very untidy data. `parameters` now consists of repeated
 variables and each row is no longer a new observation, since they are
 repeated for each ID. In this specific case, there isn’t a great reason
-to untidy our data however, untidying it in the way we just did could be
-useful for plotting each physical parameter as a discrete variable for
-something like a barplot!
+to untidy our data; however, untidying it in the way we just did could
+be useful for plotting each physical parameter as a discrete variable
+for something like a barplot!
 
 Anyway, our data is now untidy and could be useful for future plotting.
 Let’s tidy it back up since it will be easier to read and manipulate
 using `tidyverse` functions, especially since we are going to do some
-summarizing up ahead! To tidy up, we’ll use the “inverse” of
+wrangling up ahead! To tidy up, we’ll use the “inverse” of
 `pivot_longer()`, `pivot_wider()`.
 
 ``` r
@@ -186,29 +183,25 @@ summarizing up ahead! To tidy up, we’ll use the “inverse” of
 cancer_tidy <- cancer_untidy %>% 
   pivot_wider(names_from = parameters, values_from = measurements)
 
-print(cancer_tidy)
+head(cancer_tidy)
 ```
 
-    ## # A tibble: 569 × 32
-    ##          ID diagnosis radius_m…¹ textu…² perim…³ area_…⁴ smoot…⁵ compa…⁶ conca…⁷
-    ##       <dbl> <chr>          <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1   842302 M               18.0    10.4   123.    1001   0.118   0.278   0.300 
-    ##  2   842517 M               20.6    17.8   133.    1326   0.0847  0.0786  0.0869
-    ##  3 84300903 M               19.7    21.2   130     1203   0.110   0.160   0.197 
-    ##  4 84348301 M               11.4    20.4    77.6    386.  0.142   0.284   0.241 
-    ##  5 84358402 M               20.3    14.3   135.    1297   0.100   0.133   0.198 
-    ##  6   843786 M               12.4    15.7    82.6    477.  0.128   0.17    0.158 
-    ##  7   844359 M               18.2    20.0   120.    1040   0.0946  0.109   0.113 
-    ##  8 84458202 M               13.7    20.8    90.2    578.  0.119   0.164   0.0937
-    ##  9   844981 M               13      21.8    87.5    520.  0.127   0.193   0.186 
-    ## 10 84501001 M               12.5    24.0    84.0    476.  0.119   0.240   0.227 
-    ## # … with 559 more rows, 23 more variables: concave_points_mean <dbl>,
-    ## #   symmetry_mean <dbl>, fractal_dimension_mean <dbl>, radius_se <dbl>,
-    ## #   texture_se <dbl>, perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
-    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
-    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
-    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>,
-    ## #   smoothness_worst <dbl>, compactness_worst <dbl>, concavity_worst <dbl>, …
+    ## # A tibble: 6 × 32
+    ##       ID diagn…¹ radiu…² textu…³ perim…⁴ area_…⁵ smoot…⁶ compa…⁷ conca…⁸ conca…⁹
+    ##    <dbl> <chr>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ## 1 8.42e5 M          18.0    10.4   123.    1001   0.118   0.278   0.300   0.147 
+    ## 2 8.43e5 M          20.6    17.8   133.    1326   0.0847  0.0786  0.0869  0.0702
+    ## 3 8.43e7 M          19.7    21.2   130     1203   0.110   0.160   0.197   0.128 
+    ## 4 8.43e7 M          11.4    20.4    77.6    386.  0.142   0.284   0.241   0.105 
+    ## 5 8.44e7 M          20.3    14.3   135.    1297   0.100   0.133   0.198   0.104 
+    ## 6 8.44e5 M          12.4    15.7    82.6    477.  0.128   0.17    0.158   0.0809
+    ## # … with 22 more variables: symmetry_mean <dbl>, fractal_dimension_mean <dbl>,
+    ## #   radius_se <dbl>, texture_se <dbl>, perimeter_se <dbl>, area_se <dbl>,
+    ## #   smoothness_se <dbl>, compactness_se <dbl>, concavity_se <dbl>,
+    ## #   concave_points_se <dbl>, symmetry_se <dbl>, fractal_dimension_se <dbl>,
+    ## #   radius_worst <dbl>, texture_worst <dbl>, perimeter_worst <dbl>,
+    ## #   area_worst <dbl>, smoothness_worst <dbl>, compactness_worst <dbl>,
+    ## #   concavity_worst <dbl>, concave_points_worst <dbl>, symmetry_worst <dbl>, …
 
 Great, now our data is back to the tidyness that it was before. Each
 column is once again a variable, in this case a physical parameter, and
@@ -235,13 +228,15 @@ Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
 
-Research question 1 is an interesting question that could help to
-identify a certain physical characteristic as a diagnostic marker of
-tumour malignancy.
+**Research Question 1 is an interesting exploratory question that could
+help to identify certain physical characteristics as potential
+diagnostic markers of tumour malignancy.**
 
-Research question 2 would be interesting to explore simply because there
-are many physical parameters that are linked in tumours so it would be
-fun to see how they are related.
+**Research question 2 would be interesting to explore because there are
+many physical parameters that are linked in tumours. It would be
+valuable to understand how these characteristics are linked and could be
+useful to generate models of physical tumour characteristics down the
+line.**
 
 <!----------------------------------------------------------------------------->
 
@@ -252,10 +247,12 @@ dropping irrelevant columns, etc.).
 
 <!--------------------------- Start your work below --------------------------->
 
+#### Wrangling our data
+
 We will go ahead and modify the original `cancer` dataframe so that it
 is more concise and interpretable for us. We are mostly interested in
-the “mean” values so let’s nto concern ourselves with anything else. In
-other words, we will drop all standard error and *worst* columns.
+the “mean” values so let’s not concern ourselves with anything else. In
+other words, we will drop all *standard error* and *worst* columns.
 Additionally, something that we might really be interested in with
 respect to diagnostic markers is the `area_mean`, so let’s arrange
 `area_mean` in descending order and also make sure there are no `NA`
@@ -267,13 +264,30 @@ but will also make the plot labels nicer to read down the line.
 ``` r
 # Summarize our data as above
 cancer_dat <- cancer %>% 
-  select(-ends_with("worst"), -ends_with("_se")) %>% 
-  arrange(desc(area_mean)) %>% 
-  filter(is.na(area_mean) == FALSE) %>% 
+  select(-ends_with("worst"), -ends_with("_se")) %>% # 1
+  arrange(desc(area_mean)) %>% # 2
+  filter(is.na(area_mean) == FALSE) %>% # 3
   summarize(ID, 
             diagnosis = case_when(diagnosis == "M" ~ "Malignant", diagnosis == "B" ~ "Benign"), 
-            across(ends_with("mean")))
+            across(ends_with("mean"))) # 4
+
+glimpse(cancer_dat)
 ```
+
+    ## Rows: 569
+    ## Columns: 12
+    ## $ ID                     <dbl> 911296202, 8810703, 873592, 899987, 8611555, 91…
+    ## $ diagnosis              <chr> "Malignant", "Malignant", "Malignant", "Maligna…
+    ## $ radius_mean            <dbl> 27.42, 28.11, 27.22, 25.73, 25.22, 24.63, 24.25…
+    ## $ texture_mean           <dbl> 26.27, 18.47, 21.87, 17.46, 24.91, 21.60, 20.20…
+    ## $ perimeter_mean         <dbl> 186.9, 188.5, 182.1, 174.2, 171.5, 165.5, 166.2…
+    ## $ area_mean              <dbl> 2501, 2499, 2250, 2010, 1878, 1841, 1761, 1747,…
+    ## $ smoothness_mean        <dbl> 0.10840, 0.11420, 0.10940, 0.11490, 0.10630, 0.…
+    ## $ compactness_mean       <dbl> 0.19880, 0.15160, 0.19140, 0.23630, 0.26650, 0.…
+    ## $ concavity_mean         <dbl> 0.3635, 0.3201, 0.2871, 0.3368, 0.3339, 0.2310,…
+    ## $ concave_points_mean    <dbl> 0.16890, 0.15950, 0.18780, 0.19130, 0.18450, 0.…
+    ## $ symmetry_mean          <dbl> 0.2061, 0.1648, 0.1800, 0.1956, 0.1829, 0.1991,…
+    ## $ fractal_dimension_mean <dbl> 0.05623, 0.05525, 0.05770, 0.06121, 0.06782, 0.…
 
 <!----------------------------------------------------------------------------->
 
@@ -290,6 +304,8 @@ you’d like). If you don’t have such a plot, you’ll need to make one.
 Place the code for your plot below.
 
 <!-------------------------- Start your work below ---------------------------->
+
+#### Generate our plot from Milestone 1
 
 Now we can modify our newly made dataframe from above. We will make a
 plot that is similar but slightly modified from some of the plots in
@@ -315,34 +331,57 @@ sum_cancer <- mean_cancer %>%
   select(-diagnosis) %>% 
   summarize(across(ends_with("mean"), ~lead(.x) - .x, .names = "{.col}_diff"))%>% 
   na.omit()
+
+glimpse(sum_cancer)
 ```
+
+    ## Rows: 1
+    ## Columns: 10
+    ## $ radius_mean_diff            <dbl> 5.316306
+    ## $ texture_mean_diff           <dbl> 3.690144
+    ## $ perimeter_mean_diff         <dbl> 37.28997
+    ## $ area_mean_diff              <dbl> 515.5862
+    ## $ smoothness_mean_diff        <dbl> 0.01042084
+    ## $ compactness_mean_diff       <dbl> 0.06510316
+    ## $ concavity_mean_diff         <dbl> 0.1147171
+    ## $ concave_points_mean_diff    <dbl> 0.06227259
+    ## $ symmetry_mean_diff          <dbl> 0.01872297
+    ## $ fractal_dimension_mean_diff <dbl> -0.0001873006
 
 One important consideration about comparing these *differences* is that
 not all differences are the same (?). For example, `area` values are
 much larger than any other physical parameter in this dataset.
 Differences in area mean might seem huge in comparison to a parameter
-like `fractal_complexity`, whose values are about 100X smaller and a
-difference might be as small as 0.1. To account for this, we can try and
-normalize all the differences by a normalization factor, which in the
-case will be the sum of all the differences. We will also divide the
-normalization factor by an arbitrary number (100) so that the
-differences between parameters are a little but more noticeable (which I
-think we are allowed to do?).
+like `fractal_complexity`, whose values are about 100X smaller. To
+account for this, we can try and normalize all the differences by a
+normalization factor, which in this case will be the sum of all the
+differences. We will also divide the normalization factor by an
+arbitrary number (100) so that trends are a little bit more noticeable
+(which I think we are allowed to do?).
 
 ``` r
 # Create our normalization factor which is the sum of all the mean differences (in our case this is the sum of all columns in our row) divided by 100
 normalizationFactor <- rowSums(sum_cancer[1, ]) / 100
 
 # Use pivot_longer() to pivot all physical property names into one column and values into another
-# Here, we will also mutate all of our differences by the normalization factor and add an arbitrary constant 1.1 so that all of our values are greater than 0 (this is important since we will log transform our axis later on)
+# Here, we will also mutate all of our differences by the normalization factor and add an arbitrary constant, 1.1, so that all of our values are greater than 0  (this is important since we will log transform our axis later on and don't want to see negative values when taking log(x < 1))
 norm_cancer <- sum_cancer %>% 
   pivot_longer(cols = ends_with("diff"), names_to = "Physical_Property", values_to = "Difference") %>% 
   separate(Physical_Property, into = c("Physical_Property"), sep = "_", remove = TRUE) %>% 
-  mutate(Difference = (Difference / normalizationFactor) + 1.1) 
+  mutate(Difference = (Difference / normalizationFactor) + 1.1) # normalize our difference values and add arbitrary constant 1.1
 ```
 
     ## Warning: Expected 1 pieces. Additional pieces discarded in 10 rows [1, 2, 3, 4,
     ## 5, 6, 7, 8, 9, 10].
+
+``` r
+glimpse(norm_cancer)
+```
+
+    ## Rows: 10
+    ## Columns: 2
+    ## $ Physical_Property <chr> "radius", "texture", "perimeter", "area", "smoothnes…
+    ## $ Difference        <dbl> 2.045703, 1.756430, 7.733412, 92.816239, 1.101854, 1…
 
 Now let’s generate our barplot:
 
@@ -404,7 +443,7 @@ Now, choose two of the following tasks.
 
 **Task Number**: 1
 
-#### Reorder Levels from Greatest to Least by `Difference`
+#### Reorder levels from greatest to least by `Difference`
 
 Oftentimes, it is beneficial to see plots in decreasing or increasing
 order. This allows our *eyes* to more easily understand trends and
@@ -448,7 +487,7 @@ fct_cancer %>%
 
 **Task Number**: 2
 
-#### Collapse Uninteresting Factors into a New Factor Called “Other”
+#### Collapse uninteresting factors into a new factor called “Other”
 
 From the above plot, we see that there are a lot of bars that basically
 show a whole lot of nothing (i.e. there isn’t a big difference between
@@ -517,12 +556,15 @@ specifics in STAT 545.
 
 <!-------------------------- Start your work below ---------------------------->
 
+#### Testing for statistical significance of `area_mean` between diagnosis groups
+
 From our plots above, it looks like there’s a pretty big difference
-between the mean area of malignant and benign tumour groups. Let’s see
-if this difference is actually statistically significant.
+between the `area_mean` of malignant and benign tumour groups. Let’s see
+if this difference is actually statistically significant using a t-test.
 
 First, we will go back to the original `cancer` dataframe and extract
-all `area_mean` values for each diagnosis group.
+all `area_mean` values for each diagnosis group. Then we will use the
+`t.test()` function to perform a t-test on our means.
 
 ``` r
 # Create two new variables storing all `area_mean` values for malignant groups or benign groups
@@ -556,6 +598,8 @@ Y, or a single value like a regression coefficient or a p-value.
 
 <!-------------------------- Start your work below ---------------------------->
 
+#### Extracting a p-value
+
 Since we have decided to use a t-test to assess significance of results
 between malignant and benign diagnosis between area means, we need to
 see the ***p-value*** to actually assess how confident we are in the
@@ -577,7 +621,7 @@ pvalue
     ## [1] 3.284366e-52
 
 Our p-value looks super small so it looks like it’s safe to say that the
-difference in area mean between benign and malignant groups is
+difference in `area_mean` between benign and malignant groups is
 statistically significant!
 
 <!----------------------------------------------------------------------------->
@@ -602,6 +646,8 @@ function.
     file, and remake it simply by knitting this Rmd file.
 
 <!-------------------------- Start your work below ---------------------------->
+
+#### Write `cancer_dat` as a csv file to a new directory called `output`
 
 First, let’s load the `here` package. We can avoid this by simply
 calling the `here()` function directly from the `here` package like so:
@@ -642,28 +688,31 @@ Use the functions `saveRDS()` and `readRDS()`.
 
 <!-------------------------- Start your work below ---------------------------->
 
-Now we will save our model object to a .rds file. Let’s go ahead and
-save the our model object from the t-test to a new variable called
-`task3_obj`. Then, we will save this model object as a .rds with
-`saveRDS()` and then reload into R with `readRDS()`
+#### Write our model object to an .rds file and load it back into our environmentk
+
+Now we will save our model object to a .rds file. The name of our model
+object is `testT` so we will save this as a .rds with `saveRDS()` and
+then reload into R with `readRDS()`.
 
 ``` r
-# Create a new object called task3_obj that saves the entire output of glance(testT)
-task3_obj <- glance(testT)
+# Write a .rds file from testT as task3_obj.rds. Use the here() function for robustness
+saveRDS(testT, here("output", "task3_obj.rds"))
 
-# Write a .rds file from task3_obj. Use the here() function for robustness
-saveRDS(task3_obj, here("output", "task3_obj.rds"))
-
-# Load our .rds file
+# Load our .rds file 
 readRDS(here("output", "task3_obj.rds"))
 ```
 
-    ## # A tibble: 1 × 10
-    ##   estimate estimate1 estimate2 statistic  p.value param…¹ conf.…² conf.…³ method
-    ##      <dbl>     <dbl>     <dbl>     <dbl>    <dbl>   <dbl>   <dbl>   <dbl> <chr> 
-    ## 1    -516.      463.      978.     -19.6 3.28e-52    245.   -567.   -464. Welch…
-    ## # … with 1 more variable: alternative <chr>, and abbreviated variable names
-    ## #   ¹​parameter, ²​conf.low, ³​conf.high
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  benign_area and malignant_area
+    ## t = -19.641, df = 244.79, p-value < 2.2e-16
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -567.2919 -463.8805
+    ## sample estimates:
+    ## mean of x mean of y 
+    ##  462.7902  978.3764
 
 <!----------------------------------------------------------------------------->
 
