@@ -6,7 +6,7 @@ Milestone 1 of the Mini Data Analysis project is meant as a gentle introduction 
 
 ## Files
 #### mini-project-1.Rmd
-The R Markdown file of the Mini Data Analysis delivarable 1 containing some exploratory data analysis of the `cancer_sample` dataset from the `datateachr` R package.
+The R Markdown file of the Mini Data Analysis deliverable 1 containing some exploratory data analysis of the `cancer_sample` dataset from the `datateachr` R package.
 
 #### mini-project-1.md
 The plain markdown file generated from knitting the .Rmd file. 
