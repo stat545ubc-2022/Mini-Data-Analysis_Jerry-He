@@ -685,11 +685,11 @@ object is `testT` so we will save this as a .rds with `saveRDS()` and
 then reload into R with `readRDS()`.
 
 ``` r
-# Write a .rds file from testT as task3_obj.rds. Use the here() function for robustness
-saveRDS(testT, here("output", "task3_obj.rds"))
+# Write a .rds file from testT as model_obj.rds. Use the here() function for robustness
+saveRDS(testT, here("output", "model_obj.rds"))
 
 # Load our .rds file 
-readRDS(here("output", "task3_obj.rds"))
+readRDS(here("output", "model_obj.rds"))
 ```
 
     ## 
